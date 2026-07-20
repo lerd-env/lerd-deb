@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+jobs:
+  build-deb:
+    name: Build and verify .deb
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends devscripts debhelper dput
+
+      - name: Build binary package and assert contents
+        run: |
+          version=$(cat published-version)
+          if [ "$version" = "0.0.0" ]; then
+            version=$(curl -fsSL https://api.github.com/repos/lerd-env/lerd/releases/latest | jq -r .tag_name)
+            version=${version#v}
+          fi
+          echo "Building for lerd ${version}"
+          scripts/build-binary.sh "$version"

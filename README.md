@@ -1,0 +1,66 @@
+# lerd-deb
+
+Debian/Ubuntu packaging for [lerd](https://lerd.sh), published to the
+`ppa:lerd/lerd` Launchpad PPA.
+
+## Install
+
+```bash
+sudo add-apt-repository ppa:lerd/lerd
+sudo apt update
+sudo apt install lerd
+lerd install
+```
+
+Updates arrive through apt like any other package:
+
+```bash
+sudo apt upgrade
+```
+
+## How it works
+
+Launchpad PPAs build from signed **source** packages, not prebuilt binaries. lerd
+needs a very recent Go toolchain and a network-fetched Svelte UI, neither of which
+the network-isolated Launchpad build farm can provide. So this repo does not build
+lerd from source. Instead it repackages the binaries already published on each
+[upstream release](https://github.com/lerd-env/lerd/releases): the source tarball
+ships the prebuilt `lerd` (and `lerd-tray` on amd64), and `debian/rules` installs
+the one matching the architecture Launchpad is building for.
+
+The package uses the `3.0 (native)` source format so the prebuilt binaries can live
+in the source tarball without a separate orig tarball. Each upstream version is
+uploaded once per Ubuntu series with a `~series` version suffix (for example
+`1.29.0~noble1`).
+
+## Automation
+
+`.github/workflows/publish.yml` polls the upstream repo daily. When a new release
+appears it builds signed source packages and `dput`s them to the PPA, then records
+the version in `published-version`. Manual runs are limited to repo admins.
+
+`.github/workflows/ci.yml` builds a binary `.deb` on every push and asserts it
+installs `/usr/bin/lerd`.
+
+## Prerequisites
+
+The publishing workflow needs an OpenPGP key that is registered on the Launchpad
+account that owns the PPA:
+
+- `GPG_PRIVATE_KEY` secret: the ASCII-armored private key used to sign uploads.
+- The matching public key added at `launchpad.net/~<account>/+editpgpkeys`, and its
+  email confirmed on the account.
+
+Enable the `arm64` processor in the PPA settings if you want arm64 builds.
+
+## Manual publish
+
+```bash
+sudo apt install devscripts debhelper dput
+# dry run, unsigned source build:
+scripts/build-source.sh 1.29.0
+# build a binary .deb and check it installs the binary:
+scripts/build-binary.sh 1.29.0
+# real signed upload:
+GPG_KEY_ID=<your-key-id> scripts/publish.sh 1.29.0
+```

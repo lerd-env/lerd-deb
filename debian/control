@@ -1,0 +1,20 @@
+Source: lerd
+Section: devel
+Priority: optional
+Maintainer: George Dumitrescu <george@dumitres.co>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://lerd.sh
+Rules-Requires-Root: no
+
+Package: lerd
+Architecture: amd64 arm64
+Depends: ${misc:Depends}, podman
+Recommends: libayatana-appindicator3-1
+Description: Herd-like local PHP development environment
+ Lerd runs Nginx, PHP-FPM, and services as rootless Podman containers, with a
+ built-in web UI, TUI, CLI, and MCP server. No Docker, no sudo, no system
+ pollution.
+ .
+ This package installs the prebuilt lerd binary published on each upstream
+ release. Run "lerd install" once after installing to set up the stack.

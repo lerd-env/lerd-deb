@@ -1,0 +1,42 @@
+#!/bin/sh
+set -e
+
+# apt runs as root, but lerd is rootless and per-user. On a single-user desktop
+# we finish setup automatically: do the root-level, machine-global steps here as
+# root, then run the per-user half as the human who invoked apt. This needs a
+# lerd that supports the unattended split (lerd bootstrap --system and
+# lerd install --unattended); older builds fall back to a manual nudge.
+auto_setup() {
+    [ -d /run/systemd/system ] || return 1
+    user="${SUDO_USER:-}"
+    [ -n "$user" ] && [ "$user" != root ] || return 1
+    uid="$(id -u "$user" 2>/dev/null)" || return 1
+
+    lerd bootstrap --help >/dev/null 2>&1 || return 1
+
+    # Linger first so the user's systemd instance is alive even with nobody
+    # logged in; then the root prerequisites (ports, linger, DNS sudoers); then
+    # the rootless install as the user; then trust the CA it generated in the
+    # system store. This order lets managed .test DNS work with no prompts.
+    loginctl enable-linger "$user" || true
+    lerd bootstrap --system --user "$user" || true
+    runuser -u "$user" -- env "XDG_RUNTIME_DIR=/run/user/$uid" \
+        lerd install --unattended || true
+    lerd bootstrap --trust-ca --user "$user" || true
+    return 0
+}
+
+case "$1" in
+    configure)
+        if auto_setup; then
+            echo "lerd is set up and running. Open the dashboard from the tray or run 'lerd'."
+        else
+            echo "lerd installed. Run 'lerd install' once to set up the stack."
+            echo "Keep it current with 'sudo apt upgrade'."
+        fi
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

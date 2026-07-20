@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+# The binaries are prebuilt upstream and shipped in the source tarball, so the
+# usual Go build/test steps are no-ops. dh_auto_install picks the binary that
+# matches the architecture Launchpad is building for.
+
+%:
+	dh $@
+
+override_dh_auto_build:
+override_dh_auto_test:
+
+override_dh_auto_install:
+	install -d debian/lerd/usr/bin
+	install -m0755 prebuilt/$(DEB_HOST_ARCH)/lerd debian/lerd/usr/bin/lerd
+	if [ -f prebuilt/$(DEB_HOST_ARCH)/lerd-tray ]; then \
+		install -m0755 prebuilt/$(DEB_HOST_ARCH)/lerd-tray debian/lerd/usr/bin/lerd-tray; \
+	fi
+
+# The binaries are already stripped, statically linked (lerd) or optionally
+# linked (lerd-tray). Skip the tooling that would either fail or force a hard
+# dependency on libayatana; the tray link stays a Recommends.
+override_dh_strip:
+override_dh_dwz:
+override_dh_shlibdeps:
