@@ -1,7 +1,25 @@
 # lerd-deb
 
-Debian/Ubuntu packaging for [lerd](https://lerd.sh), published to the
-`ppa:lerd/lerd` Launchpad PPA.
+> Open-source Herd-like local PHP development environment, packaged for
+> Debian/Ubuntu and published to the [`ppa:lerd/lerd`](https://launchpad.net/~lerd/+archive/ubuntu/lerd)
+> Launchpad PPA.
+
+[![CI](https://github.com/lerd-env/lerd-deb/actions/workflows/ci.yml/badge.svg)](https://github.com/lerd-env/lerd-deb/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/lerd-env/lerd)](https://github.com/lerd-env/lerd/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-lerd.sh-blue)](https://lerd.sh)
+[![Reddit](https://img.shields.io/badge/Reddit-r%2Flerd-ff2d20?logo=reddit)](https://reddit.com/r/lerd)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/5JK54s7xCC)
+
+![Lerd dashboard tour](https://raw.githubusercontent.com/lerd-env/lerd/main/docs/assets/screenshots/tour.gif)
+
+[Lerd](https://lerd.sh) runs Nginx, PHP-FPM, and your services as rootless
+[Podman](https://podman.io) containers: automatic `.test` domains with HTTPS,
+per-project PHP versions, one-click databases and services, a built-in web UI,
+TUI, CLI and MCP server. No Docker, no sudo, no system pollution. This repo
+makes it a first-class Ubuntu citizen: `apt install lerd` brings up the whole
+stack on its own, and every update after that arrives with your normal system
+updates.
 
 ## Install
 
