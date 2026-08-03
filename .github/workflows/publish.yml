@@ -4,7 +4,16 @@ on:
   schedule:
     # Daily at 09:30 UTC, a little after the nixos updater.
     - cron: "30 9 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Publish this version even if it is already recorded (backfill)"
+        required: false
+        default: ""
+      series:
+        description: "Space separated series to publish for (empty = the full list)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -56,7 +65,14 @@ jobs:
         id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
+          if [ -n "$INPUT_VERSION" ]; then
+            echo "Manual backfill of ${INPUT_VERSION}"
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+            echo "version=${INPUT_VERSION}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           latest_tag=$(curl -sSL \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             https://api.github.com/repos/lerd-env/lerd/releases/latest \
@@ -89,10 +105,13 @@ jobs:
         if: steps.check.outputs.updated == 'true'
         env:
           GPG_KEY_ID: ${{ steps.gpg.outputs.key_id }}
+          LERD_SERIES: ${{ inputs.series }}
         run: scripts/publish.sh "${{ steps.check.outputs.version }}"
 
+      # A backfill republishes a version that is already recorded, so the
+      # record is only written on the scheduled new-release path.
       - name: Record published version
-        if: steps.check.outputs.updated == 'true'
+        if: steps.check.outputs.updated == 'true' && inputs.version == ''
         run: |
           echo "${{ steps.check.outputs.version }}" > published-version
           git config user.name "github-actions[bot]"
