@@ -5,11 +5,25 @@ Debian/Ubuntu packaging for [lerd](https://lerd.sh), published to the
 
 ## Install
 
+The PPA carries packages for every Ubuntu release in standard support and for
+the current development release (the `SERIES` list in `scripts/common.sh`).
+On one of those:
+
 ```bash
 sudo add-apt-repository ppa:lerd/lerd
 sudo apt update
 sudo apt install lerd
 lerd install
+```
+
+On any other release, `add-apt-repository` leaves behind a source entry that
+fails every later `apt update`, because the PPA has nothing published for that
+series. If that has already happened, remove it with
+`sudo add-apt-repository --remove ppa:lerd/lerd`. Either way, use the
+[script installer](https://lerd.sh) instead:
+
+```bash
+curl -fsSL https://lerd.sh/install.sh | bash
 ```
 
 Updates arrive through apt like any other package:

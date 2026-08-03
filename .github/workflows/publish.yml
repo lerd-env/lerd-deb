@@ -40,7 +40,17 @@ jobs:
       - name: Install packaging tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends devscripts debhelper dput
+          sudo apt-get install -y --no-install-recommends devscripts debhelper dput distro-info
+
+      - name: Fail if the series list misses a current Ubuntu release
+        run: |
+          source scripts/common.sh
+          missing=$(comm -23 <(ubuntu-distro-info --supported | sort) \
+            <(printf '%s\n' "${SERIES[@]}" | sort))
+          if [ -n "$missing" ]; then
+            echo "::error::SERIES in scripts/common.sh is missing: $(echo $missing). Users on those releases get a broken apt source instead of a package."
+            exit 1
+          fi
 
       - name: Check for a newer lerd release
         id: check
