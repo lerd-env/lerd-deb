@@ -31,8 +31,13 @@ On one of those:
 sudo add-apt-repository ppa:lerd/lerd
 sudo apt update
 sudo apt install lerd
-lerd install
 ```
+
+On a typical single-user desktop that is the whole setup: the package finishes
+it automatically, the machine-global steps as root, then the per-user install
+as the user who ran sudo. When it cannot (no systemd, not installed through
+sudo, a multi-user machine) it prints a note and you run `lerd install` once
+yourself.
 
 On any other release, `add-apt-repository` leaves behind a source entry that
 fails every later `apt update`, because the PPA has nothing published for that
