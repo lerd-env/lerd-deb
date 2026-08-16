@@ -76,6 +76,11 @@ uploaded once per Ubuntu series with a `~series` version suffix (for example
 appears it builds signed source packages and `dput`s them to the PPA, then records
 the version in `published-version`. Manual runs are limited to repo admins.
 
+Launchpad's upload endpoint returns a 550 often enough that a run can end with
+only part of the series list uploaded. Each upload is retried, and any series the
+archive already holds is skipped, so the next run finishes the series that are
+missing rather than pushing everything again.
+
 `.github/workflows/ci.yml` builds a binary `.deb` on every push and asserts it
 installs `/usr/bin/lerd`.
 
