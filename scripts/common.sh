@@ -9,7 +9,7 @@ PPA="${PPA:-ppa:lerd/lerd}"
 # Ubuntu series to publish to: every release in standard support plus the open
 # development series, so packages exist on release day. The publish workflow
 # fails when this goes stale; override one-off runs with LERD_SERIES="...".
-read -ra SERIES <<< "${LERD_SERIES:-jammy noble resolute stonking}"
+read -ra SERIES <<< "${LERD_SERIES:-jammy noble resolute stonking tenacious}"
 
 # Maintainer identity for the changelog trailer and the signing key UID. The
 # email must match a GPG key registered on the uploading Launchpad account.
